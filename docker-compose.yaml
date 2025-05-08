@@ -1,0 +1,24 @@
+version: '3.7'
+services:
+  tor:
+    image: dperson/torproxy
+    container_name: tor
+    ports:
+      - "9050:9050"
+    command: -a
+
+  scraper:
+    build: ./scraper
+    volumes:
+      - ./scraper:/app
+    depends_on:
+      - tor
+    command: python3 scrape.py
+
+  rest-api:
+    build: ./backend/rest-api
+    volumes:
+      - ./backend/rest-api:/app
+    depends_on:
+      - scraper
+    command: node index.js
